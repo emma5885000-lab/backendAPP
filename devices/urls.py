@@ -1,0 +1,13 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    # Endpoint pour le hardware (authentification via device_key)
+    path('data/', views.receive_sensor_data, name='receive_sensor_data'),
+    
+    # Endpoints pour l'utilisateur (authentification via token)
+    path('my-devices/', views.my_devices, name='my_devices'),
+    path('create/', views.create_device, name='create_device'),
+    path('sensor-data/', views.my_sensor_data, name='my_sensor_data'),
+    path('latest-ai/', views.latest_ai_result, name='latest_ai_result'),
+]
