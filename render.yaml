@@ -2,12 +2,16 @@ services:
   - type: web
     name: esante-backend
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
     startCommand: gunicorn esante_backend.wsgi:application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.4
       - key: DEBUG
-        value: False
+        value: "False"
       - key: ALLOWED_HOSTS
-        value: .onrender.com
+        value: ".onrender.com"
+      - key: DATABASE_URL
+        value: "postgresql://esant_user:qhUhNIPdAI04FDwo0Ip68x6Rzw5GPgqd@dpg-d5l31temcj7s73abk3tg-a.virginia-postgres.render.com/esant"
+      - key: SECRET_KEY
+        value: "django-insecure-render-production-key-change-this"
