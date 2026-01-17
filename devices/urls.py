@@ -2,8 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Endpoint pour le hardware (authentification via device_key)
+    # Endpoints pour le hardware (authentification via device_key)
     path('data/', views.receive_sensor_data, name='receive_sensor_data'),
+    path('hardware/data/', views.receive_sensor_data, name='hardware_receive_sensor_data'),  # Alias pour l'ESP32
     
     # Endpoints pour l'utilisateur (authentification via token)
     path('my-devices/', views.my_devices, name='my_devices'),
