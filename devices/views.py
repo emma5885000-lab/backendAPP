@@ -177,6 +177,103 @@ def my_sensor_data(request):
     return Response(data)
 
 
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def update_device(request, device_id):
+    """Met à jour un device de l'utilisateur connecté"""
+    try:
+        device = Device.objects.get(id=device_id, user=request.user)
+    except Device.DoesNotExist:
+        return Response(
+            {"error": "Device non trouvé"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Mettre à jour les champs autorisés
+    if 'name' in request.data:
+        device.name = request.data['name']
+    if 'is_active' in request.data:
+        device.is_active = request.data['is_active']
+    
+    device.save()
+    
+    return Response({
+        "id": str(device.id),
+        "name": device.name,
+        "device_key": device.device_key,
+        "is_active": device.is_active,
+        "created_at": device.created_at.isoformat(),
+        "last_data_at": device.last_data_at.isoformat() if device.last_data_at else None,
+        "message": "Device mis à jour avec succès"
+    })
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_device(request, device_id):
+    """Supprime un device de l'utilisateur connecté"""
+    try:
+        device = Device.objects.get(id=device_id, user=request.user)
+    except Device.DoesNotExist:
+        return Response(
+            {"error": "Device non trouvé"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    device_name = device.name
+    device.delete()
+    
+    return Response({
+        "message": f"Device '{device_name}' supprimé avec succès"
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_device(request, device_id):
+    """Récupère les détails d'un device spécifique"""
+    try:
+        device = Device.objects.get(id=device_id, user=request.user)
+    except Device.DoesNotExist:
+        return Response(
+            {"error": "Device non trouvé"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    return Response({
+        "id": str(device.id),
+        "name": device.name,
+        "device_key": device.device_key,
+        "is_active": device.is_active,
+        "created_at": device.created_at.isoformat(),
+        "last_data_at": device.last_data_at.isoformat() if device.last_data_at else None
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def regenerate_device_key(request, device_id):
+    """Régénère la clé d'un device"""
+    try:
+        device = Device.objects.get(id=device_id, user=request.user)
+    except Device.DoesNotExist:
+        return Response(
+            {"error": "Device non trouvé"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    # Générer une nouvelle clé
+    device.device_key = secrets.token_hex(32)
+    device.save()
+    
+    return Response({
+        "id": str(device.id),
+        "name": device.name,
+        "device_key": device.device_key,
+        "message": "Clé du device régénérée avec succès"
+    })
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def latest_ai_result(request):
