@@ -109,3 +109,36 @@ def contacts_list(request):
         } for contact in contacts
     ]
     return Response(data, status=status.HTTP_200_OK)
+
+# Assigner un médecin à un patient
+@api_view(['POST'])
+def assign_doctor(request):
+    """
+    Assigne un médecin à un patient.
+    Body: {"patient_email": "...", "doctor_email": "..."}
+    """
+    patient_email = request.data.get('patient_email')
+    doctor_email = request.data.get('doctor_email')
+    
+    if not patient_email or not doctor_email:
+        return Response({"error": "patient_email et doctor_email requis"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        patient = User.objects.get(email=patient_email, role='patient')
+    except User.DoesNotExist:
+        return Response({"error": "Patient non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        doctor = User.objects.get(email=doctor_email, role='doctor')
+    except User.DoesNotExist:
+        return Response({"error": "Docteur non trouvé"}, status=status.HTTP_404_NOT_FOUND)
+    
+    patient.medecin = doctor
+    patient.save()
+    
+    return Response({
+        "success": True,
+        "message": f"Le docteur {doctor.username} a été assigné au patient {patient.username}",
+        "patient": {"id": patient.id, "email": patient.email, "username": patient.username},
+        "doctor": {"id": doctor.id, "email": doctor.email, "username": doctor.username}
+    }, status=status.HTTP_200_OK)

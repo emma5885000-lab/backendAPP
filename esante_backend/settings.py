@@ -91,7 +91,7 @@ DATABASES = {
 }
 
 # Configuration pour Render (utilise DATABASE_URL si disponible)
-DATABASE_URL = os.environ.get('DATABASE_URL')
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://esant_user:qhUhNIPdAI04FDwo0Ip68x6Rzw5GPgqd@dpg-d5l31temcj7s73abk3tg-a.virginia-postgres.render.com/esant')
 if DATABASE_URL:
     DATABASES['default'] = dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
 
